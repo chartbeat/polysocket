@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Polysocket Web</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+    </head>
+    <body>
+        <header>
+            <h1>Polysocket</h1>
+        </header>
+        <form action="" method="POST" id="command">
+            <code>(function() {</code>
+            <textarea name="cmd" class="code-entry"></textarea>
+            <input type="submit" value="Run" />
+            <code>})();</code>
+        </form>
+        <section id="stored">
+            <ul>
+                <li>Get time since page load</li>
+                <li>Schedule page refresh</li>
+            </ul>
+        </section>
+        <script src="/static/js/webui.js"></script>
+    </body>
+</html>
