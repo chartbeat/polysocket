@@ -2,6 +2,7 @@
   var form = document.querySelector('#command');
   var cmd = form.querySelector('[name="cmd"]');
   var post = form.querySelector('[name="post-processor"]');
+  var programList = document.querySelector('#program-list');
   var log = document.querySelector('.responses');
   var master = new WebSocket('ws://localhost:8888/master/');
   var results = [];
@@ -37,21 +38,48 @@
     log.appendChild(frag);
   };
 
+  window.LOG = logResults;
+
+  function loadProgram(p) {
+    cmd.value = p.command;
+    post.value = p.postProcessor;
+  };
+
   function bindListeners() {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+    document.querySelector('#run').addEventListener('click', function() {
       postCommand(cmd.value);
+    });
+
+    document.querySelector('#load').addEventListener('click', function() {
+      toggleProgramList();
+    });
+
+    programList.addEventListener('click', function(e) {
+      if (e.target.nodeName === 'LI') {
+        loadProgram({
+          command: e.target.getAttribute('data-command'),
+          postProcessor: e.target.getAttribute('data-post-process')
+        });
+      }
+      toggleProgramList();
     });
   };
 
+  function toggleProgramList() {
+    if (programList.className == 'visible') {
+      programList.className = '';
+    } else {
+      programList.className = 'visible';
+    }
+  };
+
   function getPostProcessor() {
-    var val = post.value;
-    if (val == '// Process') { // TODO deal with properly
+    if (!post.value) {
       return;
     }
 
     try {
-      postProcessor = eval('(function(results){' + val + '})');
+      postProcessor = eval('(function(results){' + post.value + '})');
       return postProcessor;
     } catch (e) {
       alert('Invalid post-processor specified');

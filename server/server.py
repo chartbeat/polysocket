@@ -1,3 +1,4 @@
+import asyncmongo
 import json
 import logging
 import os
@@ -5,15 +6,18 @@ import uuid
 
 from argparse import ArgumentParser
 from tornado import ioloop
-from tornado.template import Loader
 from tornado.web import Application
+from tornado.web import HTTPError
 from tornado.web import RequestHandler
 from tornado.web import StaticFileHandler
+from tornado.web import asynchronous
 from tornado.websocket import WebSocketHandler
 
 SOCKETS = set()
 CONTROLS = {}
 VERSION = 0.1
+
+SETTINGS = {}
 
 BANNER = """
               _                      _        _   
@@ -42,6 +46,8 @@ def wrap_output(master, message):
 def parse_command_line():
     parser = ArgumentParser(description='Polysocket server')
     parser.add_argument('--port', dest='port', metavar='p', type=int, default='8888', help='The port to run the server on')
+    parser.add_argument('--mongo-server', dest='mongo_server', type=str, default='127.0.0.1', help='The location of the mongo server')
+    parser.add_argument('--mongo-port', dest='mongo_port', type=int, default=27017, help='The port the mongo server is listening on')
     return parser.parse_args()
 
 class PolySocketHandler(WebSocketHandler):
@@ -79,11 +85,27 @@ class StatsHandler(RequestHandler):
         self.write(json.dumps(data))
 
 class WebUIHandler(RequestHandler):
-    loader = Loader(os.path.join(os.getcwd(), 'templates'))
+    @property
+    def db(self):
+        if not hasattr(self, '_db'):
+            self._db = asyncmongo.Client(pool_id='polysocket', host=SETTINGS.mongo_server,
+                                         port=SETTINGS.mongo_port, maxcached=10, maxconnections=50, dbname='polysocket')
+        return self._db
 
+    @property
+    def templates_dir(self):
+        if not hasattr(self, '_templates_dir'):
+            self._templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        return self._templates_dir
+
+    @asynchronous
     def get(self):
-        template = self.loader.load('webui.html').generate()
-        self.write(template)
+        self.db.programs.find(callback=self._on_complete)
+
+    def _on_complete(self, response, error):
+        if error:
+            raise HTTPError(500)
+        self.render(os.path.join(self.templates_dir, 'webui.html'), programs=response)
         
 application = Application([
     (r'/', WebUIHandler),
@@ -94,16 +116,16 @@ application = Application([
 ])
 
 if __name__ == '__main__':
-    args = parse_command_line()
+    SETTINGS = parse_command_line()
     log_format = '[%(asctime)s] %(message)s'
     logging.basicConfig(format=log_format)
     logger = logging.getLogger('polysocket')
     logger.setLevel(logging.INFO)
     print BANNER
-    logger.info('Server running at 127.0.0.1:{port}'.format(port=args.port))
-    logger.info('No database connected')
+    logger.info('Server running at 127.0.0.1:{port}'.format(port=SETTINGS.port))
+    logger.info('MongoDB connection is at {server}:{port}'.format(server=SETTINGS.mongo_server, port=SETTINGS.mongo_port))
     try:
-        application.listen(args.port)
+        application.listen(SETTINGS.port)
         ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
         pass

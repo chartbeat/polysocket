@@ -46,7 +46,7 @@ code:first-child {
 .code-entry {
   background-color: #fff;
   border: 0 none;
-  border-left: 3px solid #A9EDF5;
+  border-left: 1px solid #efefef;
   display: block;
   font-family: Courier, monospace;
   font-size: 14px;
@@ -61,26 +61,33 @@ code:first-child {
 }
 
 input[type="submit"] {
-  background-color: #A9EDF5;
+  background-color: transparent;
   border: 0 none;
-  border-left: 1px solid #92DFE8;
-  bottom: 0;
+  bottom: 6px;
   cursor: pointer;
   font-size: 16px;
   margin: 0;
   position: absolute;
+  right: 10px;
+}
+
+.responses {
+  background-color: #343434;
+  bottom: 0;
+  left: 0;
+  position: absolute;
   right: 0;
-  top: 0;
-  width: 100px;
+  top: 459px;
 }
 
 .responses code {
-  background-color: #f5f5f5;
-  border-top: 0 none;  
+  border: 0 none;  
+  color: #f2f2f2;
+  padding-bottom: 0;
 }
 
 .responses code:before {
-  content: ">>> ";
+  content: ">> ";
 }
 
 header {
@@ -88,15 +95,18 @@ header {
   color: #fff;
 }
 
-.list-icon {
-  background-image: url('../img/icon/list.png');
-  background-repeat; no-repeat;
-  display: block;
-  height: 33px;
-  left: 20px;
-  position: absolute;
-  top: 45px;
-  width: 34px;
+#controls {
+  background-color: #111;
+  padding: 0 10px;
+  text-align: left;
+}
+
+#controls span {
+  color: #f1f1f1;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  padding: 5px 10px;
 }
 
 h1 {
@@ -105,4 +115,26 @@ h1 {
   letter-spacing: 2px;
   margin: 0;
   padding: 50px 0 80px;
+}
+
+#program-list {
+  background-color: #111;
+  color: #f1f1f1;
+  height: 0;
+  font-size: 14px;
+  list-style-type: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  transition: height .3s ease-in-out, padding .3s ease-in-out;
+}
+
+#program-list.visible {
+  height: 200px;
+  padding-bottom: 10px;
+}
+
+#program-list li {
+  padding: 10px 10px 0;
 }

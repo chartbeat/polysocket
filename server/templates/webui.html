@@ -7,18 +7,31 @@
     <body>
         <header>
             <h1>Polysocket</h1>
-            <span class="list-icon"></span>
+            <div id="controls">
+                <span id="load">Load</span>
+                <span id="save">Save</span>
+                <span id="run">Run</span>
+            </div>
         </header>
+        <ul id="program-list">
+            {% for p in programs %}
+                <li class="program" data-command="{{ p['command'] }}" data-post-process="{{ p['postprocessor'] }}">
+                    {{ p['name'] }}
+                </li>
+            {% end %}
+        </ul>
         <form action="" method="POST" id="command">
             <code>(function() {</code>
             <div class="no-break">
-                <textarea name="cmd" class="code-entry">// Execute on clients</textarea>
-                <textarea name="post-processor" class="code-entry">// Process</textarea>
+                <textarea name="cmd" class="code-entry" placeholder="Code to execute on all clients"></textarea>
+                <textarea name="post-processor" class="code-entry" placeholder="Post-Processing code"></textarea>
             </div>
             <input type="submit" value="Run" />
             <code>})();</code>
         </form>
-        <div class="responses"></div>
+        <div class="responses">
+            <code>Waiting</code>
+        </div>
         <script src="/static/js/webui.js"></script>
     </body>
 </html>
