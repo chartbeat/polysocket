@@ -15,6 +15,10 @@ body {
   padding: 0
 }
 
+.no-break {
+  white-space: nowrap;
+}
+
 form {
   position: relative;
 }
@@ -27,6 +31,16 @@ code {
   font-size: 14px;
   padding: 10px;
   text-align: left;
+}
+
+code:first-child {
+  border-top: 1px solid #111;
+}
+
+#command textarea {
+  display: inline-block;
+  height: 250px;
+  width: 50%;
 }
 
 .code-entry {
@@ -60,10 +74,29 @@ input[type="submit"] {
   width: 100px;
 }
 
+.responses code {
+  background-color: #f5f5f5;
+  border-top: 0 none;  
+}
+
+.responses code:before {
+  content: ">>> ";
+}
+
 header {
   background-color: #343434;
   color: #fff;
-  margin-bottom: 100px;
+}
+
+.list-icon {
+  background-image: url('../img/icon/list.png');
+  background-repeat; no-repeat;
+  display: block;
+  height: 33px;
+  left: 20px;
+  position: absolute;
+  top: 45px;
+  width: 34px;
 }
 
 h1 {
@@ -72,31 +105,4 @@ h1 {
   letter-spacing: 2px;
   margin: 0;
   padding: 50px 0 80px;
-}
-
-#stored {
-  background-color: lightgreen;
-  border-top: 1px solid darkgreen;
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  right: 0;
-}
-
-#stored ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 5px;
-}
-
-#stored li {
-  font-size: 14px;
-  padding: 5px 10px;
-  text-align: left;
-}
-
-#stored li:hover {
-  background-color: purple;
-  color: #fff;
-  cursor: pointer;
 }

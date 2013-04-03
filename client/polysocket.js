@@ -26,9 +26,11 @@
 
   PolySocket.prototype.handleMessage = function(evt) {
     try {
-      var retVal = eval(evt.data);
+      var split = evt.data.split(']');
+      var command = split[1];
+      var retVal = eval(command);
       if (retVal) {
-        this.socket.send(retVal);
+        this.socket.send([split[0], retVal].join(']'));
       }
     } catch (e) {
       // How to handle failures? Call back to server? Silent?

@@ -11,7 +11,7 @@ def get_num_connections(server):
     @return int, The number of open connections
     """
     response = requests.get('http://{addr}/stats/'.format(addr=server))
-    return response.json.get('connections', 0)
+    return response.json.get('slaves', 0)
 
 def run_command(server, command):
     """

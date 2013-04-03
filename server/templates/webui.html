@@ -7,19 +7,18 @@
     <body>
         <header>
             <h1>Polysocket</h1>
+            <span class="list-icon"></span>
         </header>
         <form action="" method="POST" id="command">
             <code>(function() {</code>
-            <textarea name="cmd" class="code-entry"></textarea>
+            <div class="no-break">
+                <textarea name="cmd" class="code-entry">// Execute on clients</textarea>
+                <textarea name="post-processor" class="code-entry">// Process</textarea>
+            </div>
             <input type="submit" value="Run" />
             <code>})();</code>
         </form>
-        <section id="stored">
-            <ul>
-                <li>Get time since page load</li>
-                <li>Schedule page refresh</li>
-            </ul>
-        </section>
+        <div class="responses"></div>
         <script src="/static/js/webui.js"></script>
     </body>
 </html>
