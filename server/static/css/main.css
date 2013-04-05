@@ -20,6 +20,7 @@ body {
 }
 
 form {
+  overflow: hidden;
   position: relative;
 }
 
@@ -60,24 +61,15 @@ code:first-child {
   border-color: #92DFE8;
 }
 
-input[type="submit"] {
-  background-color: transparent;
-  border: 0 none;
-  bottom: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 0;
-  position: absolute;
-  right: 10px;
-}
-
 .responses {
   background-color: #343434;
   bottom: 0;
   left: 0;
+  overflow: scroll;
+  padding-bottom: 5px;
   position: absolute;
   right: 0;
-  top: 459px;
+  top: 487px;
 }
 
 .responses code {
@@ -117,24 +109,57 @@ h1 {
   padding: 50px 0 80px;
 }
 
-#program-list {
-  background-color: #111;
-  color: #f1f1f1;
-  height: 0;
+.slide-window {
+  background-color: #fefefe;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+  color: #333;
   font-size: 14px;
-  list-style-type: none;
+  height: 300px;
+  left: 25%;
   margin: 0;
-  overflow: hidden;
-  padding: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: 10px;
+  position: absolute;
   text-align: left;
-  transition: height .3s ease-in-out, padding .3s ease-in-out;
+  transition: -webkit-transform .2s ease-in-out, top .2s ease-in-out;
+  top: -150px;
+  width: 50%;
+  z-index: 5000;
+  -webkit-transform: rotateX(90deg);
+  -webkit-perspective: 500;
 }
 
-#program-list.visible {
-  height: 200px;
-  padding-bottom: 10px;
+.popup-head {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+
+.popup-head h2 {
+  margin: 0;
+  display: inline-block;
+}
+
+.popup-head input {
+  float: right;
+}
+
+#program-list ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.slide-window.visible {
+  top: 0px;
+  -webkit-transform: rotateX(0deg);
 }
 
 #program-list li {
-  padding: 10px 10px 0;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+#program-list li:hover {
+  background-color: #ccc;
 }

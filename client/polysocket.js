@@ -25,15 +25,19 @@
   };
 
   PolySocket.prototype.handleMessage = function(evt) {
+    // There can be more than one ], so only take first ocurrence
+    // as marking the master ID
+    var split = evt.data.split(']');
+    var master = split.shift();
+    var command = split.join(']');
+
     try {
-      var split = evt.data.split(']');
-      var command = split[1];
       var retVal = eval(command);
       if (retVal) {
-        this.socket.send([split[0], retVal].join(']'));
+        this.socket.send([master, retVal].join(']'));
       }
     } catch (e) {
-      // How to handle failures? Call back to server? Silent?
+      this.socket.send([master, e.message].join(']'));
     }
   };
 

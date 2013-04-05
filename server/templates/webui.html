@@ -3,30 +3,45 @@
     <head>
         <title>Polysocket Web</title>
         <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+        <script src="/static/js/lib/jquery-1.9.1.min.js"></script>
     </head>
     <body>
         <header>
             <h1>Polysocket</h1>
             <div id="controls">
-                <span id="load">Load</span>
-                <span id="save">Save</span>
+                <span id="load" data-slide-window="#program-list">Load</span>
+                <span id="save" data-slide-window="#save-window">Save</span>
                 <span id="run">Run</span>
             </div>
         </header>
-        <ul id="program-list">
+        <div id="program-list" class="slide-window">
+            <div class="popup-head">
+                <h2>Load Program</h2>
+                <input type="text" placeholder="Filter..." />
+            </div>
+            <ul>
             {% for p in programs %}
                 <li class="program" data-command="{{ p['command'] }}" data-post-process="{{ p['postprocessor'] }}">
                     {{ p['name'] }}
                 </li>
             {% end %}
-        </ul>
+            </ul>
+        </div>
+        <div id="save-window" class="slide-window">
+            <div class="popup-head">
+                <h2>Save Program</h2>
+            </div>
+            <form action="/save/" method="POST">
+                <input type="text" name="name" placeholder="Enter a name for the program" />
+                <input type="submit" value="Save" />
+            </form>
+        </div>
         <form action="" method="POST" id="command">
             <code>(function() {</code>
             <div class="no-break">
-                <textarea name="cmd" class="code-entry" placeholder="Code to execute on all clients"></textarea>
-                <textarea name="post-processor" class="code-entry" placeholder="Post-Processing code"></textarea>
+                <textarea name="cmd" class="code-entry" placeholder="Code to execute on all clients"></textarea><!--
+                --><textarea name="post-processor" class="code-entry" placeholder="Post-Processing code"></textarea>
             </div>
-            <input type="submit" value="Run" />
             <code>})();</code>
         </form>
         <div class="responses">

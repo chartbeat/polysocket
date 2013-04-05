@@ -36,9 +36,14 @@ def parse_master(message):
     @param str: message, The message from the client
     @return (str, str), The master socket to message and the response to send
     """
+    print message
     results = message.split(']')
     results[0] = results[0].replace('[', '')
-    return (results[0], results[1])
+    master = results[0].replace('[', '')
+    response = ']'.join(results[1:])
+    print master
+    print response
+    return (master, response)
 
 def wrap_output(master, message):
     return '[%s](function(){%s})()' % (master, message)
@@ -72,6 +77,7 @@ class MasterSocketHandler(WebSocketHandler):
 
     def on_message(self, message):
         wrapped = wrap_output(self.uuid, message)
+        print wrapped
         for socket in SOCKETS:
             socket.write_message(wrapped)
 
@@ -101,6 +107,14 @@ class WebUIHandler(RequestHandler):
     @asynchronous
     def get(self):
         self.db.programs.find(callback=self._on_complete)
+
+    @asynchronous
+    def post(self):
+        content = json.loads(self.request.body)
+        self.db.programs.insert(content, callback=self._post_post_redirect)
+
+    def _post_post_redirect(self, response, error):
+        self.redirect('/')
 
     def _on_complete(self, response, error):
         if error:

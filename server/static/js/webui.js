@@ -1,16 +1,31 @@
-(function() {
-  var form = document.querySelector('#command');
-  var cmd = form.querySelector('[name="cmd"]');
-  var post = form.querySelector('[name="post-processor"]');
-  var programList = document.querySelector('#program-list');
-  var log = document.querySelector('.responses');
-  var master = new WebSocket('ws://localhost:8888/master/');
+$(function() {
+  var DOM = {
+    form: $('#command'),
+    commandInput: $('textarea[name="cmd"]'),
+    postProcessor: $('textarea[name="post-processor"]'),
+    programList: $('#program-list'),
+    saveWindow: $('#save-window'),
+    responses: $('.responses')
+  };
+
+  var master;
   var results = [];
   var finishedTimer;
   var postProcessor;
 
-  master.onmessage = function(e) {
-    if (finishedTimer) clearTimeout(finishedTimer);
+  init();
+
+  function init() {
+    master = new WebSocket('ws://' + window.location.host + '/master/');
+    master.onmessage = handleClientMessage;
+    bindListeners();
+  };
+
+  function handleClientMessage(e) {
+    if (finishedTimer) {
+      clearTimeout(finishedTimer);
+    }
+
     results.push(e.data);
     finishedTimer = setTimeout(function() {
       if (postProcessor) {
@@ -19,15 +34,10 @@
         logResults(results);
       }
     }, 300);
-  };
-
-  init();
-
-  function init() {
-    bindListeners();
-  };
+  }
 
   function logResults(r) {
+    DOM.responses.empty();
     var frag = document.createDocumentFragment();
     var node;
     for (var i = 0, l = r.length; i < l; ++i) {
@@ -35,51 +45,80 @@
       node.innerHTML = r[i];
       frag.appendChild(node);
     }
-    log.appendChild(frag);
+
+    DOM.responses.append(frag);
+    DOM.responses.get(0).scrollTop = DOM.responses.get(0).scrollHeight;
   };
 
   window.LOG = logResults;
 
   function loadProgram(p) {
-    cmd.value = p.command;
-    post.value = p.postProcessor;
+    DOM.commandInput.val(p.command);
+    DOM.postProcessor.val(p.postProcessor);
   };
 
   function bindListeners() {
-    document.querySelector('#run').addEventListener('click', function() {
-      postCommand(cmd.value);
+    $('#run').on('click', function(e) {
+      postCommand(DOM.commandInput.val());
     });
 
-    document.querySelector('#load').addEventListener('click', function() {
-      toggleProgramList();
+    $(window).on('keyup', function(e) {
+      if (e.keyCode === 27) {
+        $('.slide-window.visible').removeClass('visible');
+      }
     });
 
-    programList.addEventListener('click', function(e) {
+    $('body').on('click', function(evt) {
+      var currentDialog = $('.slide-window.visible');
+      var slidingWindow = evt.target.getAttribute('data-slide-window');
+
+      if (currentDialog.get(0) !== evt.target && currentDialog.has(evt.target).length === 0) {
+        currentDialog.removeClass('visible');
+      }
+
+      if (slidingWindow) {
+        $(slidingWindow).addClass('visible');
+      }
+    });
+
+    DOM.saveWindow.find('form').on('submit', function(e) {
+      e.preventDefault();
+      var name = DOM.saveWindow.find('[name="name"]').val();
+      var command = DOM.commandInput.val();
+      var postProcessor = DOM.postProcessor.val() || '';
+
+      if (!name || !command) {
+        alert('Missing name or command');
+      }
+
+      $.post('/', JSON.stringify({
+        'name': name,
+        'command': command,
+        'postprocessor': postProcessor
+      }), function(r) {
+        window.location.reload();
+      });
+    });
+
+    DOM.programList.on('click', function(e) {
       if (e.target.nodeName === 'LI') {
         loadProgram({
           command: e.target.getAttribute('data-command'),
           postProcessor: e.target.getAttribute('data-post-process')
         });
+
+        DOM.programList.removeClass('visible');
       }
-      toggleProgramList();
     });
   };
 
-  function toggleProgramList() {
-    if (programList.className == 'visible') {
-      programList.className = '';
-    } else {
-      programList.className = 'visible';
-    }
-  };
-
   function getPostProcessor() {
-    if (!post.value) {
+    if (!DOM.postProcessor.val()) {
       return;
     }
 
     try {
-      postProcessor = eval('(function(results){' + post.value + '})');
+      postProcessor = eval('(function(results){' + DOM.postProcessor.val() + '})');
       return postProcessor;
     } catch (e) {
       alert('Invalid post-processor specified');
@@ -89,7 +128,6 @@
   function postCommand(cmd) {
     postProcessor = getPostProcessor();
     results = [];
-    log.innerHTML = '';
     master.send(cmd);
   };
-})();
+});
