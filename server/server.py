@@ -36,13 +36,10 @@ def parse_master(message):
     @param str: message, The message from the client
     @return (str, str), The master socket to message and the response to send
     """
-    print message
     results = message.split(']')
     results[0] = results[0].replace('[', '')
     master = results[0].replace('[', '')
     response = ']'.join(results[1:])
-    print master
-    print response
     return (master, response)
 
 def wrap_output(master, message):
@@ -77,7 +74,6 @@ class MasterSocketHandler(WebSocketHandler):
 
     def on_message(self, message):
         wrapped = wrap_output(self.uuid, message)
-        print wrapped
         for socket in SOCKETS:
             socket.write_message(wrapped)
 
